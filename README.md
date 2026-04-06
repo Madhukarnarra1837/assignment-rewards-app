@@ -8,44 +8,45 @@ REWARDS-APP/
 ├── node_modules/
 ├── public/
 └── src/
-    ├── components/
-    │   ├── common/
-    │   │   ├── __test_table__/
-    │   │   │   └── Table.test.js
-    │   │   ├── ErrorBoundary.js
-    │   │   ├── ErrorMessage.js
-    │   │   ├── Table.css
-    │   │   └── Table.js
-    │   ├── MonthlyRewards/
-    │   │   ├── MonthlyRewardsTable.js
-    │   │   └── MonthlyRewardsTable.test.js
-    │   ├── TotalRewards/
-    │   │   ├── TotalRewardsTable.js
-    │   │   └── TotalRewardsTable.test.js
-    │   └── Transactions/
-    │       ├── __test_Transactions__/
-    │       │   └── TransactionsTable.test.js
-    │       ├── TransactionsTable.js
-    │       └── TransactionsTable.css
-    ├── hooks/
-    │   ├── __test_transaction__/
-    │   │   └── useTransactions.test.js
-    │   └── useTransactions.js
-    ├── services/
-    │   └── transactionsService.js
-    ├── utils/
-    │   ├── __test_utils__/
-    │   │   ├── aggregationUtils.test.js
-    │   │   └── rewardCalculator.test.js
-    │   ├── aggregationUtils.js
-    │   ├── dateUtils.js
-    │   ├── errorUtils.js
-    │   ├── logger.js
-    │   └── rewardCalculator.js
-    ├── App.css
-    ├── App.js
-    ├── index.css
-    └── index.js
+├── components/
+│   ├── common/
+│   │   ├── _test_table/
+│   │   │   └── Table.test.js
+│   │   ├── ErrorBoundary.js
+│   │   ├── ErrorMessage.js
+│   │   ├── Table.css
+│   │   └── Table.js
+│   ├── MonthlyRewards/
+│   │   ├── MonthlyRewardsTable.js
+│   │   └── MonthlyRewardsTable.test.js
+│   ├── TotalRewards/
+│   │   ├── TotalRewardsTable.js
+│   │   └── TotalRewardsTable.test.js
+│   ├── Transactions/
+│   │   ├── _test_Transactions/
+│   │   │   └── TransactionsTable.test.js
+│   │   ├── TransactionsTable.js
+│   │   └── TransactionsTable.css
+│   └── RewardsContainer.js
+├── hooks/
+│   ├── _test_transaction/
+│   │   └── useTransactions.test.js
+│   └── useTransactions.js
+├── services/
+│   └── transactionsService.js
+├── utils/
+│   ├── _test_utils/
+│   │   ├── aggregationUtils.test.js
+│   │   └── rewardCalculator.test.js
+│   ├── aggregationUtils.js
+│   ├── dateUtils.js
+│   ├── errorUtils.js
+│   ├── logger.js
+│   └── rewardCalculator.js
+├── App.css
+├── App.js
+├── index.css
+└── index.js
 
 ## Reward Rules
 - < $50:  0 points
@@ -123,3 +124,7 @@ Prompts the user when required date selections are missing.
 ### 3. Empty Data States
 Provides clear feedback when no records match the current filter criteria.
 ![No Records State](src/assets/Norecords.png)
+
+### Error Handling
+The application includes an Error Boundary to catch unexpected issues gracefully.
+![Unexpected Error Fallback UI](src/assets/UnexpectedErrorfallbackUI.png)
