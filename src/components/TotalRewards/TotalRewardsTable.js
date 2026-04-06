@@ -1,7 +1,6 @@
-import React,{useMemo} from 'react'
-import PropTypes from 'prop-types'
-import { aggregateTotalRewards } from '../../utils/aggregationUtils'
-import Table from '../common/Table';
+import React, { useMemo } from "react";
+import { aggregateTotalRewards } from "../../utils/aggregationUtils";
+import Table from "../common/Table";
 
 /**
  * TotalRewardsTable Component
@@ -16,32 +15,35 @@ import Table from '../common/Table';
  * @returns {React.ReactElement} A memoized table displaying total customer loyalty metrics.
  */
 
-function TotalRewardsTable({transactions}) {
-    // Derived data is memoized to avoid unnecessary recalculations.
-    
-    const data = useMemo(()=>{
-        const aggregated = aggregateTotalRewards(transactions);
-        return Object.values(aggregated)?.map(item => ({
-            customerId:item?.customerId, //stable unique identifier
-            customerName:item?.customerName,
-            rewardPoints:item?.rewardPoints,
-            totalSpent: item?.totalSpent.toFixed(2) // Format to 2 decimal places
-        }))
-    },[transactions])
+function TotalRewardsTable({ transactions, noDataMessage }) {
+  // Derived data is memoized to avoid unnecessary recalculations.
 
-    const columns = [
-        { key: 'customerId', label: 'Customer ID' },
-        {key:'customerName',label:'Customer Name'},
-        { key: 'totalSpent', label: 'Total Spent ($)' },
-        {key:'rewardPoints',label:'Total Reward Points'}
-    ]
+  const data = useMemo(() => {
+    const aggregated = aggregateTotalRewards(transactions);
+    return Object.values(aggregated)?.map((item) => ({
+      customerId: item?.customerId, //stable unique identifier
+      customerName: item?.customerName,
+      rewardPoints: item?.rewardPoints,
+      totalSpent: `$${item?.totalSpent.toFixed(2)}`, // Format to 2 decimal places
+    }));
+  }, [transactions]);
+
+  const columns = [
+    { key: "customerId", label: "Customer ID" },
+    { key: "customerName", label: "Customer Name" },
+    { key: "totalSpent", label: "Total Spent ($)" },
+    { key: "rewardPoints", label: "Total Reward Points" },
+  ];
   return (
     <>
-    <Table columns={columns} data={data} pageSize={5}/>
+      <Table
+        columns={columns}
+        data={data}
+        pageSize={5}
+        noDataMessage={noDataMessage}
+      />
     </>
-  )
+  );
 }
 
-TotalRewardsTable.propTypes = {}
-
-export default TotalRewardsTable
+export default TotalRewardsTable;

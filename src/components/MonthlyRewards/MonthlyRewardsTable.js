@@ -5,7 +5,7 @@ import Table from "../common/Table";
 
 /**
  * MonthlyRewardsTable Component
- * * This component acts as a data wrapper that transforms raw transaction data 
+ * * This component acts as a data wrapper that transforms raw transaction data
  * into a monthly aggregated format suitable for display in the generic Table component.
  * - Invokes `aggregateMonthlyRewards` to group transactions by customer and month.
  * - Sorts aggregated data chronologically (Year, then Month).
@@ -17,7 +17,7 @@ import Table from "../common/Table";
  * @returns {React.ReactElement} A memoized table showing rewards aggregated by month.
  */
 
-const MonthlyRewardsTable = ({ transactions }) => {
+const MonthlyRewardsTable = ({ transactions, noDataMessage }) => {
   const data = useMemo(() => {
     //Group transactions into monthly using the utility function.
     const aggregatedData = aggregateMonthlyRewards(transactions);
@@ -37,7 +37,7 @@ const MonthlyRewardsTable = ({ transactions }) => {
           price: item?.price,
           points: item?.rewardPoints,
           date: item?.date,
-          amountSpent: `${item?.amountSpent.toFixed(2)}`,
+          amountSpent: `$${item?.amountSpent.toFixed(2)}`,
         }))
     );
   }, [transactions]); // only re-calculate if 'transactions' changes.
@@ -47,16 +47,18 @@ const MonthlyRewardsTable = ({ transactions }) => {
     { key: "customerId", label: "CustomerId" },
     { key: "customer", label: "Name" },
     { key: "year", label: "Year" },
-    { key: "amountSpent", label: "Amount Spent" },
+    { key: "amountSpent", label: "Amount Spent ($)" },
     { key: "points", label: "Reward Points" },
   ];
 
   return (
     <>
-      {/* Only render the Table if there is data to show. 
-        pageSize is set to 5 for the initial pagination view.
-      */}
-      {data?.length > 0 && <Table columns={columns} data={data} pageSize={5} />}
+      <Table
+        columns={columns}
+        data={data}
+        pageSize={5}
+        noDataMessage={noDataMessage}
+      />
     </>
   );
 };
@@ -64,6 +66,7 @@ const MonthlyRewardsTable = ({ transactions }) => {
 // Ensure the parent component provides an array to avoid crashes.
 MonthlyRewardsTable.propTypes = {
   transactions: PropTypes.array.isRequired,
+  noDataMessage:PropTypes.string
 };
 
 export default MonthlyRewardsTable;

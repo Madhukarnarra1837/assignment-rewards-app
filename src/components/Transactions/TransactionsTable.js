@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { calculateRewards } from "../../utils/rewardCalculator";
 import Table from "../common/Table";
@@ -18,11 +18,13 @@ import { Card } from "react-bootstrap";
  * @returns {React.ReactElement} A card-wrapped table with date filter controls.
  */
 
-function TransactionsTable({ transactions }) {
+function TransactionsTable({
+  filteredTransactions,
+  setAppliedFilters,
+  setErrorMessageDetails,
+}) {
   const [startInput, setStartInput] = useState("");
   const [endInput, setEndInput] = useState("");
-
-  const [appliedFilters, setAppliedFilters] = useState({ start: "", end: "" });
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleApply = () => {
@@ -49,49 +51,41 @@ function TransactionsTable({ transactions }) {
     setErrorMessage("");
   };
 
-  const filteredTransactions = useMemo(() => {
-    return transactions.filter((txn) => {
-      if (!txn?.purchaseDate) return false;
+ const data = useMemo(() => {
+  // 1. Sort the raw transactions by date first
+  const sortedTransactions = [...filteredTransactions].sort((a, b) => {
+    return new Date(a.purchaseDate) - new Date(b.purchaseDate);
+  });
 
-      const txnTime = new Date(txn.purchaseDate).getTime();
-
-      if (appliedFilters.start) {
-        const start = new Date(appliedFilters.start).getTime();
-        if (txnTime < start) return false;
-      }
-
-      if (appliedFilters.end) {
-        const end = new Date(appliedFilters.end);
-        end.setHours(23, 59, 59, 999);
-        if (txnTime > end.getTime()) return false;
-      }
-
-      return true;
-    });
-  }, [transactions, appliedFilters]);
-
-  const data = useMemo(() => {
-    return filteredTransactions.map((txn) => ({
-      id: txn?.transactionId,
-      transactionId: txn?.transactionId,
-      customerName: txn?.customerName,
-      purchaseDate: new Date(txn.purchaseDate).toLocaleDateString(),
-      product: txn.productPurchased,
-      price: `$${txn.price}`,
-      rewardPoints: calculateRewards(txn.price),
-    }));
-  }, [filteredTransactions]);
+  // 2. Map the sorted transactions to your table rows
+  return sortedTransactions.map((txn) => ({
+    id: txn?.transactionId,
+    transactionId: txn?.transactionId,
+    customerName: txn?.customerName,
+    purchaseDate: new Date(txn.purchaseDate).toLocaleDateString(), // Format for display
+    product: txn.productPurchased,
+    price: `$${txn.price}`,
+    rewardPoints: calculateRewards(txn.price),
+  }));
+}, [filteredTransactions]);
 
   const columns = [
     { key: "transactionId", label: "Id" },
     { key: "customerName", label: "Customer" },
     { key: "purchaseDate", label: "Date (mm/dd/yyyy)" },
     { key: "product", label: "Product" },
-    { key: "price", label: "Price" },
+    { key: "price", label: "Price ($)" },
     { key: "rewardPoints", label: "Points" },
   ];
 
   const dateRangeMessage = `No transactions found between ${startInput} and ${endInput}`;
+  useEffect(() => {
+    setErrorMessageDetails({
+      startInput,
+      endInput,
+      dateRangeMessage,
+    });
+  }, [startInput, endInput, dateRangeMessage, setErrorMessageDetails]);
 
   return (
     <div className="transactions-container">
@@ -104,59 +98,43 @@ function TransactionsTable({ transactions }) {
 
           {/* Right Side: Filters */}
           <div className="filter-wrapper position-relative">
-            <div className="filter-group d-flex align-items-center gap-3">
-              <div className="d-flex align-items-center gap-2">
-                <label className="mb-0 small fw-semibold text-muted">
-                  From
-                </label>
-                <input
-                  type="date"
-                  className="form-control form-control-sm"
-                  style={{ width: "auto" }}
-                  value={startInput}
-                  onChange={(e) => {
-                    setStartInput(e.target.value);
-                    setErrorMessage("");
+            <div className="d-flex align-items-center gap-2 bg-white p-2 rounded-3 shadow-sm border">
+              <input
+                type="date"
+                className="form-control form-control-sm border-0 bg-light"
+                value={startInput}
+                onChange={(e) => setStartInput(e.target.value)}
+              />
+              <span className="text-muted">→</span>
+              <input
+                type="date"
+                className="form-control form-control-sm border-0 bg-light"
+                value={endInput}
+                onChange={(e) => setEndInput(e.target.value)}
+              />
+              <button
+                className="btn btn-sm px-3 fw-semibold"
+                style={{
+                    backgroundColor: "#475569",
+                    color: "#f8fafc",
                   }}
-                />
-              </div>
-
-              <div className="d-flex align-items-center gap-2">
-                <label className="mb-0 small fw-semibold text-muted">To</label>
-                <input
-                  type="date"
-                  className="form-control form-control-sm"
-                  style={{ width: "auto" }}
-                  value={endInput}
-                  onChange={(e) => {
-                    setEndInput(e.target.value);
-                    setErrorMessage("");
-                  }}
-                />
-              </div>
-
-              <div className="d-flex gap-2">
-                <button
-                  className="btn btn-primary btn-sm px-3 fw-bold"
-                  onClick={handleApply}
-                >
-                  Apply
-                </button>
-                <button
-                  className="btn btn-outline-secondary btn-sm px-3"
-                  onClick={handleReset}
-                >
-                  Reset
-                </button>
-              </div>
+                onClick={handleApply}
+              >
+                Apply
+              </button>
+              <button
+                className="btn btn-link btn-sm text-muted text-decoration-none"
+                onClick={handleReset}
+              >
+                Reset
+              </button>
             </div>
-
             {/* Error Message Tooltip */}
             {errorMessage && (
               <span
                 className="error-tooltip bg-danger text-white px-2 py-1 rounded small position-absolute"
                 style={{
-                  top: "110%",
+                  top: "80%",
                   right: "0",
                   zIndex: 10,
                   fontSize: "11px",
@@ -172,7 +150,11 @@ function TransactionsTable({ transactions }) {
         <Table
           columns={columns}
           data={data}
-          noDataMessage={startInput || endInput ? dateRangeMessage:"No records found matching your criteria."}
+          noDataMessage={
+            startInput || endInput
+              ? dateRangeMessage
+              : "No records found matching your criteria."
+          }
           pageSize={5}
         />
       </Card.Body>
@@ -181,7 +163,9 @@ function TransactionsTable({ transactions }) {
 }
 
 TransactionsTable.propTypes = {
-  transactions: PropTypes.array.isRequired,
+  filteredTransactions: PropTypes.array.isRequired,
+  setAppliedFilters: PropTypes.func.isRequired,
+  setErrorMessageDetails: PropTypes.func.isRequired,
 };
 
 export default TransactionsTable;

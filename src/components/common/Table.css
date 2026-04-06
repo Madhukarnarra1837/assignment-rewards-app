@@ -8,22 +8,7 @@
   border: 1px solid #edf2f7;
 }
 
-/* Filter Input Enhancement */
-.table-filter {
-  width: 100%;
-  max-width: 300px;
-  padding: 10px 16px;
-  margin-bottom: 20px;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
-}
 
-.table-filter:focus {
-  border-color: #4a90e2;
-}
 
 /* Modern Table Layout */
 .table {
@@ -65,44 +50,9 @@
 .table tr:hover td {
   background-color: #f8fafc;
 }
-.sortable-header {
-  padding: 12px 16px;
-  cursor: pointer;
-  background-color: #f8fafc;
-  border-bottom: 2px solid #e2e8f0;
-}
 
-/* This container forces the icon to the right corner */
-.header-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Pushes text left and icon right */
-  width: 100%;
-  min-height: 24px;
-}
 
-.label-text {
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: #475569;
-  text-transform: uppercase;
-  white-space: nowrap; /* Prevents text from breaking into two lines */
-}
 
-.sort-icon {
-  margin-left: 10px; /* This is your gap */
-  font-size: 1.1rem;
-  color: #94a3b8;    /* A nice professional gray */
-  display: flex;
-  align-items: center;
-  user-select: none;
-}
-
-/* Active state: Make icon blue when sorting is active */
-.sortable-header:hover .sort-icon,
-.sortable-header .sort-icon:not(:contains('⇅')) {
-  color: #2563eb;
-}
 /* Pagination Buttons */
 .pagination {
   display: flex;
@@ -161,4 +111,10 @@
   border-radius: 4px;
   background-color: white;
   cursor: pointer;
+}
+.pagination{
+  .page-link{
+    border: none;
+    color: #000;
+  }
 }

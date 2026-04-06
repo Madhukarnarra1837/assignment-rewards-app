@@ -44,8 +44,18 @@ const Table = React.memo(
       const { key, direction } = sortConfig;
 
       return [...filteredData].sort((a, b) => {
-        if (a[key] < b[key]) return direction === "asc" ? -1 : 1;
-        if (a[key] > b[key]) return direction === "asc" ? 1 : -1;
+        let valA = a[key];
+        let valB = b[key];
+
+        // Check if the value is a date string (e.g., "2/11/2024")
+        // and convert to a number for chronological sorting
+        if (key.toLowerCase().includes("date")) {
+          valA = new Date(valA).getTime();
+          valB = new Date(valB).getTime();
+        }
+
+        if (valA < valB) return direction === "asc" ? -1 : 1;
+        if (valA > valB) return direction === "asc" ? 1 : -1;
         return 0;
       });
     }, [filteredData, sortConfig]);
@@ -59,10 +69,11 @@ const Table = React.memo(
     const paginatedData = useMemo(() => {
       const startIndex = (currentPage - 1) * rowsPerPage;
       return sortedData?.slice(startIndex, startIndex + rowsPerPage);
-    }, [sortedData, currentPage, initialPageSize, rowsPerPage]);
+    }, [sortedData, currentPage, rowsPerPage]);
 
     // 4. Correct Total Pages calculation
-    const totalPages = Math.ceil((filteredData?.length || 0) / rowsPerPage) || 1;
+    const totalPages =
+      Math.ceil((filteredData?.length || 0) / rowsPerPage) || 1;
 
     const handleSort = (columnKey) => {
       setSortConfig((prev) =>
@@ -88,35 +99,43 @@ const Table = React.memo(
           </Col>
         </Row>
 
-        <BSTable striped bordered hover responsive className="mb-0" >
+        <BSTable striped bordered hover responsive className="mb-0">
           <thead className="table-light">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
                   onClick={() => handleSort(col.key)}
-                  style={{ cursor: "pointer" }}
+                  style={{
+                    cursor: "pointer",
+                    backgroundColor: "#475569",
+                    color: "#f8fafc",
+                    padding: "15px 10px",
+                    fontWeight: "600",
+                    fontSize: "0.9rem",
+                    border: "none",
+                  }}
                 >
                   {col.label}{" "}
-                  {sortConfig?.key === col.key
-                    ? sortConfig.direction === "asc"
-                      ? "↑"
-                      : "↓"
-                    : "⇅"}
+                  <span style={{ marginLeft: "8px", opacity: "0.8" }}>
+                    {sortConfig?.key === col.key
+                      ? sortConfig.direction === "asc"
+                        ? "↑"
+                        : "↓"
+                      : "⇅"}
+                  </span>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {paginatedData.length > 0 ? (
-              paginatedData.map((row) => (
-                <tr key={row.id}>
+              paginatedData.map((row, index) => (
+                <tr key={row.id || `row-${index}`}>
                   {columns.map((col) => (
                     <td key={col.key}>
                       {col.key.toLowerCase().includes("points") ? (
-                        <span className="badge bg-primary rounded-pill">
-                          {row[col.key]}
-                        </span>
+                        <span className="fw-bold">{row[col.key]}</span>
                       ) : (
                         row[col.key]
                       )}
@@ -156,14 +175,14 @@ const Table = React.memo(
             <Col
               xs={12}
               sm={6}
-              className="d-flex justify-content-sm-end mt-2 mt-sm-0"
+              className="d-flex justify-content-sm-end mt-2 mt-sm-0 pagination"
             >
               <Pagination size="sm" className="mb-0">
                 <Pagination.Prev
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((p) => p - 1)}
                 />
-                <Pagination.Item active>
+                <Pagination.Item className="fw-bold">
                   {currentPage} / {totalPages}
                 </Pagination.Item>
                 <Pagination.Next
